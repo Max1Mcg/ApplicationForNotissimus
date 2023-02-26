@@ -1,11 +1,11 @@
-using ApplicationForNotissimus;
+п»їusing ApplicationForNotissimus;
 using System.Data.Entity;
 using System.Data.SqlTypes;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
-//Получение строки подключения из файла конфигурации
+//Getting connection string from file assembly
 var cBuilder = new ConfigurationBuilder()
         .SetBasePath(Directory.GetCurrentDirectory())
         .AddJsonFile("appsettings.json");
@@ -15,14 +15,14 @@ var connectionString = Microsoft
    .Configuration
    .ConfigurationExtensions
    .GetConnectionString(configuration, "NotisDB");
-//Создание проекта
+//Create a project
 var builder = WebApplication.CreateBuilder();
 var app = builder.Build();
-//Задание url и Id для поиска
+//Setting url and Id for search
 var url = "http://partner.market.yandex.ru/pages/help/YML.xml";
 var requirementsId = "12344";
 /// <summary>
-/// Результат отображается по переходу на /View
+/// The result is displayed by switching to /View
 /// </summary>
 app.Map("/View", async (appB) => {
     string result = null;
@@ -30,8 +30,8 @@ app.Map("/View", async (appB) => {
     {
         if (dbContext.Offers.Where(s => s.Id == requirementsId).Count() == 1)
         {
-            /*В данную переменную будет записано содержимое файла Bootstrap/Index.html,
-            а затем дополнено полученными значениями. */
+            /*This variable will store the contents of the Bootstrap/Index.html file,
+            and then padded with the resulting values. */
             StringBuilder html = new StringBuilder("<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n    <title>DB offers</title>\r\n    <meta charset=\"utf-8\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\r\n    <link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css\">\r\n    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js\"></script>\r\n    <script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js\"></script>\r\n</head>\r\n<body>\r\n\r\n    <div class=\"container\">\r\n        <h2>Basic Table</h2>\r\n        <table class=\"table\">\r\n            <thead>");
             html.Append("<tr>");
             foreach (var v in typeof(Offer).GetProperties())
@@ -62,15 +62,15 @@ app.Map("/View", async (appB) => {
 });
 
 /// <summary>
-/// Закоментированная часть в методе использовалась для получения всех уникальных
-/// полей для всех offer`ов из файла сразу, ведь хранить может понадобиться любой из них.
+/// The commented out part in the method was used to get all the unique
+/// fields for all offers from the file at once, because you may need to store any of them.
 /// </summary>
 app.Run(async (context) => {
-    //Изменение кодировки, необходимо т.к. для файла используется windows-1251
+    //Changing the encoding is necessary because file uses windows-1251
     Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     XmlDocument xDoc = new XmlDocument();
     xDoc.Load(url);
-    //Получение всех офферов
+    //Get all offers
     XmlElement? xOffers = xDoc.DocumentElement["shop"]["offers"];
     XmlElement req = null;
     var s = new List<string>();
@@ -102,8 +102,8 @@ app.Run(async (context) => {
             {
                 Id = (req.GetAttribute("id"))
             };
-            /*Заполнение экземпляра класса offer значениями из xml-объекта, нужные поля
-            выбираются при помощи отражения*/
+            /*Filling an instance of the offer class with values вЂ‹вЂ‹from the xml object, the required fields
+            selected by reflection*/
             foreach (XmlNode v in req.ChildNodes)
             {
                 var property = offer.GetType().GetProperties().Where(o => o.Name == v.Name).First();
